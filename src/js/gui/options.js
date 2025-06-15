@@ -89,6 +89,13 @@ async function saveFixedPosNoAPI() {
 	await Browser.storage.set(st);
 }
 
+async function saveFixedPosLevel() {
+	const st = await Browser.storage.get();
+	st.fixedPosLevel = $("#fixedPosLevel").val();
+
+	await Browser.storage.set(st);
+}
+
 async function saveLevel() {
 	const st = await Browser.storage.get();
 	var radius = sliderRadius.value;
@@ -230,6 +237,7 @@ async function initFixedPosMap() {
 		'<div class="map-popup">' +
 			'<p>This is the location reported when the privacy level is set to <b>"Use fixed location"</b>.</p>' +
 			'<p>Click on the map or drag the marker to set a new fixed location.</p>' +
+			'<p>You can add noise to the fixed location using the security level selector below.</p>' +
 		'</div>';
 
 	fixedPosMap.popup = L.popup({
@@ -424,6 +432,7 @@ function initPages() {
 		} else if (page == "fixedPos") {
 			const st = await Browser.storage.get();
 			$('#fixedPosNoAPI').prop('checked', st.fixedPosNoAPI).checkboxradio("refresh");
+			$('#fixedPosLevel').val(st.fixedPosLevel || 'medium').selectmenu("refresh");
 
 			initFixedPosMap();
 		}
@@ -473,6 +482,7 @@ $(document).ready(function() {
 
 	$("#options input, #options select").change(saveOptions);
 	$("#fixedPosNoAPI").change(saveFixedPosNoAPI);
+	$("#fixedPosLevel").change(saveFixedPosLevel);
 
 	$("#restoreDefaults").click(restoreDefaults);
 	$("#deleteCache").click(deleteCache);

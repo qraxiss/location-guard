@@ -118,11 +118,27 @@ async function getNoisyPosition(options) {
 	var level = st.domainLevel[domain] || st.defaultLevel;
 
 	if(!st.paused && level == 'fixed' && st.fixedPosNoAPI) {
+		var fixedLevel = st.fixedPosLevel || 'medium';
+		var fixedCoords = {
+			latitude: st.fixedPos.latitude,
+			longitude: st.fixedPos.longitude
+		};
+		
+		// Add noise based on fixed location security level
+		if(fixedLevel !== 'none') {
+			var epsilon = st.epsilon / st.levels[fixedLevel].radius;
+			const PlanarLaplace = require('../common/laplace');
+			var pl = new PlanarLaplace();
+			var noisyFixed = pl.addNoise(epsilon, fixedCoords);
+			fixedCoords.latitude = noisyFixed.latitude;
+			fixedCoords.longitude = noisyFixed.longitude;
+		}
+		
 		var noisy = {
 			coords: {
-				latitude: st.fixedPos.latitude,
-				longitude: st.fixedPos.longitude,
-				accuracy: 10,
+				latitude: fixedCoords.latitude,
+				longitude: fixedCoords.longitude,
+				accuracy: fixedLevel === 'none' ? 10 : st.levels[fixedLevel].radius,
 				altitude: null,
 				altitudeAccuracy: null,
 				heading: null,
@@ -130,7 +146,7 @@ async function getNoisyPosition(options) {
 			},
 			timestamp: new Date().getTime()
 		};
-		Browser.log("returning fixed", noisy);
+		Browser.log("returning fixed with level", fixedLevel, noisy);
 		return { success: true, position: noisy };
 	}
 
@@ -163,10 +179,26 @@ async function addNoise(position) {
 		// do nothing, use real location
 
 	} else if(level == 'fixed') {
-		position.coords = {
+		var fixedLevel = st.fixedPosLevel || 'medium';
+		var fixedCoords = {
 			latitude: st.fixedPos.latitude,
-			longitude: st.fixedPos.longitude,
-			accuracy: 10,
+			longitude: st.fixedPos.longitude
+		};
+		
+		// Add noise based on fixed location security level
+		if(fixedLevel !== 'none') {
+			var epsilon = st.epsilon / st.levels[fixedLevel].radius;
+			const PlanarLaplace = require('../common/laplace');
+			var pl = new PlanarLaplace();
+			var noisyFixed = pl.addNoise(epsilon, fixedCoords);
+			fixedCoords.latitude = noisyFixed.latitude;
+			fixedCoords.longitude = noisyFixed.longitude;
+		}
+		
+		position.coords = {
+			latitude: fixedCoords.latitude,
+			longitude: fixedCoords.longitude,
+			accuracy: fixedLevel === 'none' ? 10 : st.levels[fixedLevel].radius,
 			altitude: null,
 			altitudeAccuracy: null,
 			heading: null,

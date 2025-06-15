@@ -87,6 +87,7 @@ const Browser = {
 				longitude: -171.24832
 			},
 			fixedPosNoAPI: true,
+			fixedPosLevel: "medium",
 			updateAccuracy: true,
 			epsilon: 2,
 			levels: {

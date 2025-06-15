@@ -86,6 +86,16 @@
 		<div role="main" class="ui-content no-space">
 			<div id="fixedPosMap" class="flex"></div>
 
+			<div class="ui-bar">
+				<label for="fixedPosLevel">Fixed location security level:</label>
+				<select id="fixedPosLevel">
+					<option value="none">None (exact location)</option>
+					<option value="low">Low (200m noise)</option>
+					<option value="medium" selected>Medium (500m noise)</option>
+					<option value="high">High (2000m noise)</option>
+				</select>
+			</div>
+
 			<div data-role="controlgroup" class="no-space">
 				<label>
 					<input id="fixedPosNoAPI" type="checkbox">Fixed location disables geolocation
