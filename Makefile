@@ -5,7 +5,7 @@ FIREFOX ?= $(shell which firefox)
 CHROME  ?= $(shell which google-chrome)
 EDGE    ?= $(shell which microsoft-edge)
 OPERA   ?= $(shell which opera)
-VER      = $(shell grep -Po '(?<="version": ")[^"]*' src/manifest.json)
+VER      = $(shell grep -o '"version": "[^"]*"' src/manifest.json | cut -d'"' -f4)
 
 
 default:
@@ -38,33 +38,33 @@ build/%/: $(call find, src, *)
 	rm -rf $@
 	mkdir -p $@
 	cp -r src/* $@
-	rm $@js/*.js $@js/**/*.js
+	rm -f $@/js/*.js
 
 	# bundles with common modules
-	npx browserify -r ./src/js/common/browser_base.js -r ./src/js/common/browser.js -r ./src/js/common/util.js -r ./src/js/common/post-rpc.js -r ./src/js/common/laplace.js  > $@js/common.js
-	npx browserify -r leaflet -r pelias-leaflet-plugin -r leaflet.locatecontrol -r intro.js -r jquery -r sglide ./src/js/gui/load-jquery.js   > $@js/common-gui.js
+	npx browserify -r ./src/js/common/browser_base.js -r ./src/js/common/browser.js -r ./src/js/common/util.js -r ./src/js/common/post-rpc.js -r ./src/js/common/laplace.js  > $@/js/common.js
+	npx browserify -r leaflet -r pelias-leaflet-plugin -r leaflet.locatecontrol -r intro.js -r jquery -r sglide ./src/js/gui/load-jquery.js   > $@/js/common-gui.js
 
 	# jquery has no proper npm package, we just append the code (from jquery-mobile-babel-safe) into commin-gui.js. Seel also load-jquery.js.
-	cat ./node_modules/jquery-mobile-babel-safe/js/jquery.mobile-1.4.5.js >> $@js/common-gui.js
+	cat ./node_modules/jquery-mobile-babel-safe/js/jquery.mobile-1.4.5.js >> $@/js/common-gui.js
 
 	# entry points
-	npx browserify $(COMMON_MODULES) ./src/js/main.js            > $@js/main.js
-	npx browserify $(COMMON_MODULES) ./src/js/content/content.js > $@js/content/content.js
-	npx browserify $(COMMON_MODULES) ./src/js/gui/options.js     > $@js/gui/options.js
-	npx browserify $(COMMON_MODULES) ./src/js/gui/demo.js        > $@js/gui/demo.js
-	npx browserify $(COMMON_MODULES) ./src/js/gui/popup.js       > $@js/gui/popup.js
-	npx browserify $(COMMON_MODULES) ./src/js/gui/faq.js         > $@js/gui/faq.js
+	npx browserify $(COMMON_MODULES) ./src/js/main.js            > $@/js/main.js
+	npx browserify $(COMMON_MODULES) ./src/js/content/content.js > $@/js/content/content.js
+	npx browserify $(COMMON_MODULES) ./src/js/gui/options.js     > $@/js/gui/options.js
+	npx browserify $(COMMON_MODULES) ./src/js/gui/demo.js        > $@/js/gui/demo.js
+	npx browserify $(COMMON_MODULES) ./src/js/gui/popup.js       > $@/js/gui/popup.js
+	npx browserify $(COMMON_MODULES) ./src/js/gui/faq.js         > $@/js/gui/faq.js
 
-	npx browserify ./src/js/content/inject.js                    > $@js/content/inject.js
+	npx browserify ./src/js/content/inject.js                    > $@/js/content/inject.js
 
 	# copy module css/images
-	cp -r node_modules/jquery-mobile-babel-safe/css/images node_modules/jquery-mobile-babel-safe/css/jquery.mobile-1.4.5.min.css $@css/
-	cp -r node_modules/leaflet/dist/images                 node_modules/leaflet/dist/leaflet.css                                 $@css/
-	cp -r node_modules/pelias-leaflet-plugin/dist/images   node_modules/pelias-leaflet-plugin/dist/leaflet-geocoder-mapzen.css   $@css/
-	cp node_modules/intro.js/minified/introjs.min.css                                                                            $@css/
+	cp -r node_modules/jquery-mobile-babel-safe/css/images node_modules/jquery-mobile-babel-safe/css/jquery.mobile-1.4.5.min.css $@/css/
+	cp -r node_modules/leaflet/dist/images                 node_modules/leaflet/dist/leaflet.css                                 $@/css/
+	cp -r node_modules/pelias-leaflet-plugin/dist/images   node_modules/pelias-leaflet-plugin/dist/leaflet-geocoder-mapzen.css   $@/css/
+	cp node_modules/intro.js/minified/introjs.min.css                                                                            $@/css/
 
-	cpp -P -Dis_$* src/manifest.json > $@manifest.json
-	sed -i 's/%BUILD%/$*/' $@js/common.js
+	cpp -P -Dis_$* src/manifest.json > $@/manifest.json
+	sed -i '' 's/%BUILD%/$*/' $@/js/common.js
 
 
 # package #############################################################

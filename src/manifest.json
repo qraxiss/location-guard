@@ -22,45 +22,55 @@
 	},
 #endif
 
-	"permissions": ["http://*/*", "https://*/*", "storage"],
+	"permissions": [
+		"http://*/*",
+		"https://*/*",
+		"storage"
+	],
 	"manifest_version": 2,
-
 	"background": {
 #if !is_firefox
 		"persistent": false,
 #endif
-		"scripts": ["js/common.js", "js/main.js"]
+		"scripts": [
+			"js/common.js",
+			"js/main.js"
+		]
 	},
-
 	"options_ui": {
 		"page": "options.html",
 		"open_in_tab": true
 	},
-
-// page_action has better user experience in Firefox
-// browser_action has better experience in Chrome/Edge
+	// page_action has better user experience in Firefox
+	// browser_action has better experience in Chrome/Edge
 #if is_chrome || is_edge
 	"browser_action": {
 #else
 	"page_action": {
 #endif
 		"default_icon": {
-			"16": "images/pin_16.png",
-			"19": "images/pin_19.png",
-			"20": "images/pin_20.png",
-			"32": "images/pin_32.png",
-			"38": "images/pin_38.png",
-			"40": "images/pin_40.png",
-			"64": "images/pin_64.png"
+				"16": "images/pin_16.png",
+				"19": "images/pin_19.png",
+				"20": "images/pin_20.png",
+				"32": "images/pin_32.png",
+				"38": "images/pin_38.png",
+				"40": "images/pin_40.png",
+				"64": "images/pin_64.png"
+			},
+			"default_popup": "popup.html",
+			"default_title": "Location Guard"
 		},
-		"default_popup": "popup.html",
-		"default_title": "Location Guard"
-	},
-
-	"content_scripts": [{
-		"js": ["js/common.js", "js/content/content.js"],
-		"matches": ["\u003Call_urls\u003E"],
-		"run_at": "document_start",
-		"all_frames": true
-	}]
-}
+		"content_scripts": [
+			{
+				"js": [
+					"js/common.js",
+					"js/content/content.js"
+				],
+				"matches": [
+					"\u003Call_urls\u003E"
+				],
+				"run_at": "document_start",
+				"all_frames": true
+			}
+		]
+	}
